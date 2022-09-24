@@ -64,7 +64,7 @@ const ContactData = (props) => {
     <div className={css.ContactData}>
       <div ref={dunRef}>
         <strong style={{ fontSize: "16px" }}>
-          Дүн : {ctx.burger.totalPrice}₮
+          Price : ${ctx.burger.totalPrice}
         </strong>
       </div>
       <div>
