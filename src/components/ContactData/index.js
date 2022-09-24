@@ -103,3 +103,5 @@ const ContactData = (props) => {
 };
 
 export default ContactData;
+//,
+// "destination": "/index.html"
