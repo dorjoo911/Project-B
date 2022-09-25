@@ -6,8 +6,8 @@ const Order = (props) => {
   return (
     <div className={css.Order}>
       <p>
-        Ingredients : Bacon : {props.order.orts.bacon}, Salad :{" "}
-        {props.order.orts.salad}, Beef : {props.order.orts.meet}, Cheese :{" "}
+        Ingredients : Bacon- {props.order.orts.bacon}, Salad-{" "}
+        {props.order.orts.salad}, Beef- {props.order.orts.meat}, Cheese-{" "}
         {props.order.orts.cheese}
       </p>
       <p>

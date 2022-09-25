@@ -1,13 +1,14 @@
 import React, { useContext } from "react";
+import css from "./style.module.css";
 import Burger from "../../components/Burger";
 import Button from "../../components/General/Button";
-import { Route } from "react-router-dom";
-import css from "./style.module.css";
 import ContactData from "../../components/ContactData";
+import { Route } from "react-router-dom";
 import BurgerContext from "../../context/BurgerContext";
 
 const ShippingPage = (props) => {
   const ctx = useContext(BurgerContext);
+
   const cancelOrder = () => {
     props.history.goBack();
   };

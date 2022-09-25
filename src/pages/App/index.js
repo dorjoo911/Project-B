@@ -1,12 +1,15 @@
+import css from "./style.module.css";
 import React, { useState, useEffect, Suspense, useContext } from "react";
 import { Redirect } from "react-router-dom";
-import css from "./style.module.css";
+import { Route, Switch } from "react-router-dom";
+
 import Toolbar from "../../components/Toolbar";
 import SideBar from "../../components/SideBar";
-import { Route, Switch } from "react-router-dom";
+import Logout from "../../components/Logout";
+
 import ShippingPage from "../ShippingPage";
 import LoginPage from "../LoginPage";
-import Logout from "../../components/Logout";
+
 import { BurgerStore } from "../../context/BurgerContext";
 import { OrderStore } from "../../context/OrdersContext";
 import UserContext from "../../context/UserContext";

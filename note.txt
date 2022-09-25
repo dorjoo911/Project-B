@@ -1,0 +1,471 @@
+<--------------- ***************************** ------------------------>
+                   <<< Bug Controll Report >>>
+- Removed following lines of code in firebase.json. It make occurring an 
+    web error related with html vs js type. 
+    So, removing that linbe of code fixes that kind of issues.
+    //,
+    // "destination": "/index.html"
+- < tag not found error : NODE version upgraded
+- npm lib not foun error : NPM version upgraded
+- libriary not found error on some HOOKS: then react-router-dom downgraded
+- when navigate to the OrderPage sometimes display empty refresh actions
+    So, React.Lazy may did this issues for performance async
+- Hosting deploy progress fails: Directly use cmd promt for this stage
+- Extra careful on conflicts changes while VScoding, cmd promt, git paths
+
+<--------------- ***************************** ------------------------>
+                   <<< Highlights >>>
+- Serverless Single Page Hosting, Authentication, Realtime DB
+- Test and deploy
+- style.module.css - module diffrentiate all css
+- index.js - does import by default from their component folders
+- npm install react-router-dom, axios, jwt-decode, gh-pages
+- "predeploy": "npm run build",  "deploy": "gh-pages -d build"   
+
+<--------------- ***************************** ------------------------>
+                   1. < BurgerContext />
+ 
+INGREDIENT_PRICES : { salad: 1.5, cheese: 1.5, bacon: 1.5, meat: 2 };
+Initial States: 
+    ingredients : each one default - 0
+    totalPrice : default - $1
+    purchasing : false
+    ingredientNames : each one's name
+    saving: false
+    finished: false
+    error: null
+BurgerStore component:
+    state: burger
+    toggle - toggles at BurgerContext -> initialStates.saving/sate
+    saveBurger - uses spinner, post the user's order into Firebase DB
+    clearBurger - change state with BurgerContext -> initialStates
+    addIngredient - change state with each new ingredients === orts/props
+        - totalPrice increments by orts===INGREDIENT_PRICES[orts]
+        - purchasing changes "true" ... So, all merges
+    removeIngredient - similiar with addIngredient 
+Returns:
+    <BurgerContext.Provider
+      value={{
+        burger,
+        addIngredient,
+        removeIngredient,
+        saveBurger,
+        clearBurger,
+        toggle,
+      }}
+    >
+      {props.children}
+    </BurgerContext.Provider>
+<--------------- ***************************** ------------------------>
+                     2. < OrderContext />
+initialState: { 
+    orders: [], 
+    loading: false, 
+    error: null, }
+
+OrderStore component: 
+    state: state
+    loadOrders - it does notice loading the order Spinner spins
+        - setState state, loading==> "true"
+        - get user's order with userId and auth/token
+        - then set state at top of orders in initialState
+Returns:
+    <OrderContext.Provider value={{ state, loadOrders }}>
+      {props.children}
+    </OrderContext.Provider>
+<--------------- ***************************** ------------------------>
+                     3. < UserContext />
+initialState: {
+  saving: false,
+  logginIn: false,
+  error: null,
+  errorCode: null,
+  token: null,
+  userId: null,
+  expireDate: null,}
+
+UserStore component: 
+    state: state
+    loginUserSucces: - token, userId, expireDate, refreshToken from props
+        - save all in localStorage.setItem by key, val
+        - merges in ...state,
+    logout: - remove all from localStorage.removeItem by key
+        - setSate with UserContext's initialState
+    autoRenewTokenAfterMillisec: - send post request with user auth/token
+        -  {grant_type: "refresh_token",
+            refresh_token: localStorage.getItem("refreshToken"),}
+        - then update token, userId, expireDate, refreshToken props
+        - call the loginUserSucces method again
+    loginUser: -  ...state, logginIn: true/initialState post user's auth/
+        - token with data={ email, password, returnSecureToken: true}
+        - then update token, userId, expireDate, refreshToken
+        - loginUserSucces with token, userId, expireDate, refreshToken
+    signupUser: - setState({ ...state, saving: true}) at initialState
+        - post request send with user auth/token 
+        - then save token and userId in localStorage.setItem
+        - and merge/setState ...state,
+                                saving: false,
+                                token,
+                                userId,
+                                error: null,
+                                errorCode: null,
+Returns:
+    < UserContext.Provider
+      value={{
+        state,
+        signupUser,
+        loginUser,
+        logout,
+        loginUserSucces,
+        autoRenewTokenAfterMillisec,}} >
+      {props.children}
+    </ UserContext.Provider >          
+<--------------- ***************************** ------------------------>
+                        Page#1: Login
+  { Redirect } from "react-router-dom,
+  Button and Spinner Components and UserContext from Dev
+Login Component: - useContext as ctx from UserContext
+  state: form  {email: "", password: ""} === props
+  changeEmail: - newEmail gets event==e.target.value from email input
+  changePassword: - similiar way above
+  login: - call loginUser func from UserContext with from state pass email
+Returns:
+  if userId true/exist Redirect to show end-point --> "/orders" 
+  <input onChange={changeEmail} type="text" placeholder="Email" />
+  <input onChange={changePassword} type="password"
+  if logginIn true and Spinner display and error too
+  Display <Button Login with login func as daragdsan
+
+<--------------- ***************************** ------------------------>
+                      Page#2: Sign-Up
+      { Redirect } from "react-router-dom,
+      Button and Spinner Components and UserContext from Dev
+Signup Component: - useContext as ctx from UserContext
+  states: [email, password1, password2, error] all initially= "";
+  signup: - if password1 === password2 signupUser(email, password1
+          from UserContext as ctx, otherwise setError say message!
+Returns:
+  if userId true/exist Redirect to show end-point --> "/" 
+  <input onChange={(e) => setEmail(e.target.value)} ==> email
+  <input onChange={(e) => setPassword1(e.target.value)} ==> password1
+  <input onChange={(e) => setPassword2(e.target.value)} ==> password2
+  if error true && display error message
+  if firebaseError true && display error too
+  if ctx.state.saving true && display <Spinner Comp/> with alert
+  Display <Button REGISTER with signup func as daragdsan
+
+<------------------- ***************************** ------------------------>
+                            Page#3: BurgerPage
+    Burger, BuildControls, Modal, OrderSummary imported from Components
+BurgerPage:
+  state: confirmOrder by default===false;
+  continueOrder: - props.history.push("/ship") to ShippingPage
+  showConfirmModal: - setConfirmOrder(true) change state value true
+  closeConfirmModal: - OR setConfirmOrder(false) change state val false
+Returns: Draw following Components:
+  <Modal closeConfirmModal={closeConfirmModal} show={confirmOrder}>
+    <OrderSummary onCancel={closeConfirmModal} onContinue={continueOrder} />
+  </Modal>
+  <Burger />
+  <BuildControls showConfirmModal={showConfirmModal} />
+<------------------- ***************************** ------------------------>
+                            Page#4: OrderPage
+                Order, Spinner imported from Components
+                OrderContext, UserContext from Context
+OrderPage:
+          const orderContext = useContext(OrderContext);
+          const userContext = useContext(UserContext);
+  Get=> Render()==> ComponentDidMount()==> loadOrders(userId, token)===>
+  orderContext.loadOrders(userContext.state.userId, userContext.state.token)
+  // UserContext.initialState ==> userId, token were setStated already
+
+Returns: Draw following Components:
+  <div>
+      {orderContext.state.loading ? (
+        <Spinner />
+      ) : (
+        orderContext.state.orders.map((el) => (
+          <Order key={el[0]} order={el[1]} />
+        ))
+      )}
+  </div>
+Save in DB like following format:  
+Firebase-DB
+    orders-NClijgyok8RiIQNsSlY
+              dun : 7.5
+              hayag
+                city : "test city"
+                name : "test2"
+                street : "test address"
+              orts
+                bacon:1
+                cheese:1
+                meat:1
+                salad:1
+              userId:"xVn73KLEkRc1rCHlK6XJFr8JvW12"
+<------------------- ***************************** ------------------------>
+                            Page#5: ShippingPage
+                Burger, Button, ContactData imported from Components
+                          { Route } from "react-router-dom"
+                BurgerContext from "../../context/BurgerContext"
+ShippingPage:
+          const ctx = useContext(BurgerContext);          
+  cancelOrder: - history.goBack() jump into previous page "/ship" --> "/login"
+  showContactData: - history.replace("/ship/contact") concat "/ship" + "contact"  
+
+Returns: Draw following Components:
+    <div className={css.ShippingPage}>
+      <p style={{ fontSize: "24px", color: "red" }}>
+        <strong>Mmm ... Looks So YUMMY ...</strong>
+      </p>
+      <p style={{ fontSize: "24px" }}>
+        <strong>Total : ${ctx.burger.totalPrice}</strong>
+// ***BurgerContext as ctx has burger obj===initialState.totalPrice  
+      </p>
+      <Burger />
+      <Button daragdsan={cancelOrder} btnType="Danger" text="CANCEL ORDER" />
+// <Button event listens cancelOrder or showContactData of actions
+      <Button
+        daragdsan={showContactData}
+        btnType="Success"
+        text="SHIPPING ADDRESS"
+      />
+// Route/display ContactData Component on path="/ship/contact"
+      <Route path="/ship/contact">
+        <ContactData />
+      </Route>
+    </div>
+<------------------- ***************************** ------------------------>
+                            Page#6: LandingPage
+        React, { useState, useEffect, Suspense, useContext } from "react"
+              { Route, Switch, Redirect } from "react-router-dom";
+                    Toolbar, SideBar, Logout from Components    
+                      ShippingPage, LoginPage from Pages
+        React.lazy(() => { BurgerPage, OrderPage, SignupPage } from Pages
+App:
+          const userCtx = useContext(UserContext);  
+  state: showSidebar by default="false"        
+  toggleSideBar: - setShowSidebar((prevShowSidebar) => !prevShowSidebar)
+                 - change state value opposite
+  ComponentDidMount() loginUserSucces(token, userId, expireDate, refreshToken)===>
+    userCtx.loginUserSucces(token, userId, expireDate, refreshToken) get props 
+    saved/merged it on UserContext's initialState and localStorage.setItem 
+    // UserContext.initialState ==> token, userId, expireDate, refreshToken 
+                                                        were setStated already 
+Returns: Draw following Components:
+    <div>
+      <Toolbar toggleSideBar={toggleSideBar} />
+// listens event onClick to HamburgerMenu, SideBar, Shadow components
+      <SideBar showSidebar={showSidebar} toggleSideBar={toggleSideBar} />
+      <main className={css.Content}>
+// BurgerContext has BurgerStore Component
+        <BurgerStore>
+// Suspense fallback ... .... . ..... .. . . . . .. . . . . . . . .
+          <Suspense fallback={<div>Please, wait ...</div>}>
+// UserContext initialState.userId were update and saved 
+              in localStorage.setItem("userId", userId) ===> true ?;
+            {userCtx.state.userId ? (
+// Available routes: "/logout", "/orders", "/ship"
+// orders get/diplay/render request to DB in Order page each Order
+              <Switch>
+                <Route path="/logout" component={Logout} />
+                <Route path="/orders">
+                  <OrderStore>
+                    <OrderPage />
+                  </OrderStore>
+                </Route>
+                <Route path="/ship" component={ShippingPage} />
+                <Route path="/" component={BurgerPage} />
+              </Switch>
+            ) : (
+// Only Available: path="/signup", "/login", <Redirect to="/login">
+              <Switch>
+                <Route path="/signup" component={SignupPage} />
+                <Route path="/login" component={LoginPage} />
+                <Redirect to="/login" />
+              </Switch>
+            )}
+          </Suspense>
+        </BurgerStore>
+      </main>
+    </div>
+<------------------- ***************************** ------------------------>
+                      Generic Comp-1: Button (props)
+props:  daragdsan/onClick, 
+        btnType--> className = .Success || .Danger, 
+        text like innerHtml
+<------------------- ***************************** ------------------------>
+                      Generic Comp-2: Shadow (props)
+if props:   darahad/onClick, .Shadow show || null/hide the component
+
+<------------------- ***************************** ------------------------>
+                      Generic Comp-3: Spinner
+<Spinner Comp from CSS library: https://projects.lukehaas.me/css-loaders/
+
+<------------------- ***************************** ------------------------>
+                      Generic Comp-4: Modal (props)
+                          import Shadow
+props:  show, closeConfirmModal works with (min-width: 600px) 
+
+<------------------- ***************************** ------------------------>
+                      Comp-1 MenuItem (props)
+                  { NavLink } from "react-router-dom"
+props:    {props.exact} activeClassName={css.active} to={props.link}
+Returns:  {props.children} like innerHtml
+
+<------------------- ***************************** ------------------------>
+                      Comp-2 Logo
+                  logoImage from "burger-logo.png"
+Returns:  <img src={logoImage} />
+
+<------------------- ***************************** ------------------------>
+                      Comp-3 HamburgerMenu (props)                 
+Returns:  onClick={props.toggleSideBar} className={css.HamburgerMenu} with 
+                                                      3 empty <div> spaces
+<------------------- ***************************** ------------------------>
+                      Comp-4 BurgerIngredient (props)                 
+props:  props.type ==> "bread-top, salad, bacon, meat, cheese, bread-bottom"
+
+<------------------- ***************************** ------------------------>
+                      Comp-5 Logout                  
+                  import from (UserContext);
+ComponentDidMount() ctx.logout() ===> const ctx = useContext(UserContext);
+Returns: <Redirect to="/" />
+
+<------------------- ***************************** ------------------------>
+                      Comp-6 Order (props)   
+Returns:  Ingredients :
+            Bacon- {props.order.orts.bacon}, 
+            Salad- {props.order.orts.salad}, 
+            Beef- {props.order.orts.meat}, 
+            Cheese- {props.order.orts.cheese}        
+          Address : 
+            {props.order.hayag.name} 
+            {props.order.hayag.street} 
+            {props.order.hayag.city}      
+          Total Price : 
+             $<strong>{props.order.dun}</strong>
+<------------------- ***************************** ------------------------>
+                      Comp-7 Burger   
+                React, { useContext, useMemo } from "react";
+                BurgerContext from "../../context/BurgerContext"
+                BurgerIngredient from "../BurgerIngredient"
+useMemo: - it renders on Burger ingredients changes
+        const items = Object.entries(burgerContext.burger.ingredients);
+        - monitor the burger ingredients increment by content.length 
+        - if length is 0 message: "Build your custom Burger ... !"
+Returns:  
+  <BurgerIngredient type="bread-top" />
+    {content} ==> <BurgerIngredient key={`${el[0]}${i + 1}`} type={el[0]}
+  <BurgerIngredient type="bread-bottom" />
+ - When [burgerContext.burger.ingredients] - checks that changes occurring
+
+ <------------------- ***************************** ------------------------>
+                      Comp-8 BuildControl (props)
+                  { useContext } from "react"  
+                  BurgerContext from "../../context/BurgerContext"
+- Build the Burger's ingredients Add/increment or Remove/decrement by buttons 
+        const burgerContext = useContext(BurgerContext);  
+Returns:  {props.orts}
+  Remove <Button  disabled={props.disabled[props.type]} // when ingredient/orts reach 0
+                  onClick={() => burgerContext.removeIngredient(props.type)}
+  Add <Button     onClick={() => burgerContext.addIngredient(props.type)}
+
+<------------------- ***************************** ------------------------>
+                      Comp-9 BuildControls (props)
+            import BurgerContext from "../../context/BurgerContext";
+                  import BuildControl from "../BuildControl";
+- BuildControls is parent of Build component show showConfirmModal
+        const burgerContext = useContext(BurgerContext);
+        const disabledIngredients = { ...burgerContext.burger.ingredients };\
+- disabledIngredients[key] = disabledIngredients[key] <= 0 //if each burger.ingredients in this condition 
+Returns:     < BuildControl
+                        key={el}
+                        disabled={disabledIngredients}
+                        type={el}
+                        orts={burgerContext.burger.ingredientNames[el]} />                  
+  MAKE ORDER < Button   onClick={props.showConfirmModal}
+                        disabled={!burgerContext.burger.purchasing}
+                        className={css.OrderButton}
+ <------------------- ***************************** ------------------------>
+                      Comp-10 SideBar (props)
+                  import Logo from "../Logo"; Menu from "../Menu";
+                  import Shadow from "../General/Shadow";
+- SideBar apper in Mobile screen when hit the <Menu/> it shows Shadow component
+        let classes = [css.SideBar, css.Close];
+        if (props.showSidebar) ==> classes = [css.SideBar, css.Open]; 
+Returns:  <Shadow show={props.showSidebar} darahad={props.toggleSideBar} />
+          <div onClick={props.toggleSideBar} className={classes.join(" ")}>
+            <div className={css.Logo}>
+              <Logo />
+            </div>
+            <Menu />
+          </div>
+ <------------------- ***************************** ------------------------>
+                      Comp-11 Toolbar (props)
+                  import Logo from "../Logo"; Menu from "../Menu";
+                  import HamburgerMenu from "../HamburgerMenu";
+- Toolbar apper in Mobile screen when hit the <HamburgerMenu/> it toggle SideBar component         
+Returns:  <header className={css.Toolbar}>
+            <HamburgerMenu toggleSideBar={props.toggleSideBar} />
+            <Logo />
+            <nav className={css.HideOnMobile}>
+              <Menu />
+            </nav>
+          </header>  
+ <------------------- ***************************** ------------------------>
+                      Comp-12 OrderSummary (props)
+                  import BurgerContext from "../../context/BurgerContext";
+                  import Button from "../General/Button";                  
+- OrderSummary diplay when hit the MAKE ORDER button, state: increments, totalPrice         
+Returns:  <ul>
+            {Object.keys(ctx.burger.ingredients).map((el) => (
+              <li key={el}>
+                {ctx.burger.ingredientNames[el]} : {ctx.burger.ingredients[el]}
+              </li>
+            ))}
+          </ul>
+          <p>
+            <strong>Total order: ${ctx.burger.totalPrice} </strong>
+          </p>
+          <p>Is your desired order then continiue?</p>
+          <Button daragdsan={props.onCancel} btnType="Danger" text="CANCEL" />
+          <Button daragdsan={props.onContinue} btnType="Success" text="CONTINIUE" />    
+ <------------------- ***************************** ------------------------>
+                      Comp-13 Menu
+                  import MenuItem from "../MenuItem";
+                  import UserContext from "../../context/UserContext";
+                  import jwt_decode from "jwt-decode"; 
+Returns:  User's login name from  jwt_decode(ctx.state.token).email    
+            <MenuItem exact link="/">NewOrder</MenuItem>
+            <MenuItem link="/orders">Orders</MenuItem>
+            <MenuItem link="/logout">LogOut</MenuItem>
+//Menu depends on ctx.state.userId ? ==> const ctx = useContext(UserContext);
+            <MenuItem link="/login">LOG IN</MenuItem>
+            <MenuItem link="/signup">REGISTER</MenuItem>  
+ <------------------- ***************************** ------------------------>
+                      Comp-14 ContactData
+      import React, { useState, useEffect, useRef, useContext } from "react";
+      import Button, Spinner from "../General/Button,/Spinner";                 
+      import { useHistory } from "react-router-dom";
+      import BurgerContext from "../../context/BurgerContext";
+      import UserContext from "../../context/UserContext"; 
+            const history = useHistory();
+            const userCtx = useContext(UserContext);
+            const ctx = useContext(BurgerContext);
+            const dunRef = useRef();
+state: - [name, city, street] = useState();
+ComponentWillUnmount() - if (ctx.burger.finished && !ctx.burger.error)
+                          history.replace("/orders");
+      return: ctx.clearBurger(); clean-up into initialIngredents
+      depends on [ctx.burger.finished]
+changeName: - changes state.name's style into opposite color
+            - setName from event input value
+changeStreet: - setStreet from event input value
+changeCity: - setCity from event input value
+saveOrder: - ctx.saveBurger(newOrder, userCtx.state.token)
+          - saveBurger from BurgerContext new state/newOrder - param1
+          - userCtx.state.token from UserContext - param2
+Returns:   Price : ${ctx.burger.totalPrice}    
+      if ctx.burger.saving ? <Spinner />
+      or Diplay inputs with PURCHASE < Button daragdsan={saveOrder}

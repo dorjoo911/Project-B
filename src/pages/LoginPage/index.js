@@ -35,12 +35,12 @@ const Login = (props) => {
   return (
     <div className={css.Login}>
       {ctx.state.userId && <Redirect to="/orders" />}
-      <input onChange={changeEmail} type="text" placeholder="Email" />
+      <input onChange={changeEmail} type="text" placeholder="Your email" />
       <input onChange={changePassword} type="password" placeholder="Password" />
       {ctx.state.logginIn && <Spinner />}
       {ctx.state.firebaseError && (
         <div style={{ color: "red" }}>
-          {ctx.state.firebaseError} код нь : {ctx.state.firebaseErrorCode}
+          {ctx.state.firebaseError} error/code : {ctx.state.firebaseErrorCode}
         </div>
       )}
       <Button text="LOGIN" btnType="Success" daragdsan={login} />

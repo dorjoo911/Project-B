@@ -58,7 +58,7 @@ const ContactData = (props) => {
     ctx.saveBurger(newOrder, userCtx.state.token);
   };
 
-  console.log("ContactData rendered....");
+  // console.log("ContactData rendered....");
 
   return (
     <div className={css.ContactData}>
@@ -103,5 +103,3 @@ const ContactData = (props) => {
 };
 
 export default ContactData;
-//,
-// "destination": "/index.html"

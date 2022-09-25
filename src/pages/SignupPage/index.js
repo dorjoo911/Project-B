@@ -12,15 +12,11 @@ const Signup = (props) => {
   const [password2, setPassword2] = useState("");
   const [error, setError] = useState("");
 
-  // useEffect(() => {
-  //   // check email in real time
-  // }, [email, password1]);
-  // https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyC0N0EHElAbM2-Thze87O_nOoW59EFhaKg
   const signup = () => {
     if (password1 === password2) {
       ctx.signupUser(email, password1);
     } else {
-      setError("Your password not matching!");
+      setError("The password must match!");
     }
   };
 
@@ -28,7 +24,7 @@ const Signup = (props) => {
     <div className={css.Signup}>
       {ctx.state.userId && <Redirect to="/" />}
 
-      <h1>REGISTER FORM</h1>
+      <h1>CUSTOMER REGISTER FORM</h1>
       <div>Please, input your information</div>
       <input
         onChange={(e) => setEmail(e.target.value)}
@@ -43,7 +39,7 @@ const Signup = (props) => {
       <input
         onChange={(e) => setPassword2(e.target.value)}
         type="password"
-        placeholder="Password"
+        placeholder="Re-password"
       />
       {error && <div style={{ color: "red" }}>{error}</div>}
 
@@ -51,7 +47,8 @@ const Signup = (props) => {
         <div style={{ color: "red" }}>{ctx.state.firebaseError}</div>
       )}
 
-      {ctx.state.saving && <Spinner />}
+      {ctx.state.saving && <Spinner /> &&
+        alert("Congratulations, you are successfully signed up !")}
 
       <Button text="REGISTER" btnType="Success" daragdsan={signup} />
     </div>
@@ -59,3 +56,8 @@ const Signup = (props) => {
 };
 
 export default Signup;
+
+// useEffect(() => {
+//   // check email in real time
+// }, [email, password1]);
+// https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyC0N0EHElAbM2-Thze87O_nOoW59EFhaKg

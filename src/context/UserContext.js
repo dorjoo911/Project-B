@@ -53,7 +53,7 @@ export const UserStore = (props) => {
         }
       )
       .then((result) => {
-        console.log("Token refreshed .....", result.data);
+        // console.log("Token refreshed .....", result.data);
         const token = result.data.id_token;
         const userId = result.data.user_id;
         const expiresIn = result.data.expires_in;
@@ -97,7 +97,7 @@ export const UserStore = (props) => {
       )
       .then((result) => {
         // LocalStorage ruu hadgalna
-        console.log("Logged in =======>", result.data);
+        // console.log("Logged in =======>", result.data);
         console.log(new Date());
         // console.log(new Date(new Date().getTime() + expiresIn * 1000));
         const token = result.data.idToken;
